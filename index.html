@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Unpact Menu QR — Menu Digital Simple</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#08090A;--surf:#0F1012;--card:#16171A;--card2:#1E1F24;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#F0F0EE;--muted:#68696F;--muted2:#9A9BA2;
+  --primary:#FF6B2B;--primary2:#FF9558;
+  --green:#2ECC8A;--gold:#FFD166;
+  --radius:14px;--radius-lg:20px;
+}
+body.light{
+  --bg:#F5F4F0;--surf:#FFFFFF;--card:#FFFFFF;--card2:#F0EFE9;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1A1A1A;--muted:#888;--muted2:#555;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background 0.3s,color 0.3s}
+
+/* ══ VUES ══ */
+.view{display:none}
+.view.on{display:block}
+
+/* ══ NAV ══ */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1.2rem;border-bottom:1px solid var(--border);background:var(--surf);position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(0,0,0,0.2)}
+.brand{display:flex;align-items:center;gap:0.6rem}
+.brand-logo{width:32px;height:32px;background:linear-gradient(135deg,var(--primary),var(--primary2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:900;color:white;font-family:'Syne',sans-serif;box-shadow:0 3px 10px rgba(255,107,43,0.3)}
+.brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:0.9rem}
+.brand-name span{color:var(--primary)}
+.nav-actions{display:flex;align-items:center;gap:0.4rem}
+.nav-btn{background:var(--card2);border:1px solid var(--border);color:var(--muted2);padding:0.38rem 0.8rem;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
+.nav-btn:hover{border-color:var(--primary);color:var(--primary)}
+.nav-btn.primary{background:var(--primary);color:white;border-color:var(--primary)}
+.nav-theme{background:var(--card2);border:1px solid var(--border);width:30px;height:30px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.8rem;transition:all 0.2s}
+
+/* ══ ADMIN ══ */
+.admin-body{padding:1.1rem}
+.section-tag{font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--primary);display:flex;align-items:center;gap:0.35rem;margin-bottom:0.6rem}
+.section-tag::before{content:'';display:block;width:3px;height:11px;background:var(--primary);border-radius:2px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem;margin-bottom:1rem}
+.label{font-size:0.7rem;color:var(--muted2);font-weight:500;margin-bottom:0.3rem}
+.inp{width:100%;background:var(--card2);border:1px solid var(--border2);border-radius:9px;padding:0.62rem 0.85rem;color:var(--text);font-family:'Inter',sans-serif;font-size:0.83rem;outline:none;margin-bottom:0.55rem;transition:border-color 0.2s}
+.inp:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(255,107,43,0.1)}
+.inp::placeholder{color:var(--muted)}
+.inp-2{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}
+.btn-primary{width:100%;padding:0.85rem;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--primary),var(--primary2));color:white;font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 14px rgba(255,107,43,0.3)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(255,107,43,0.4)}
+.btn-secondary{width:100%;padding:0.75rem;border-radius:var(--radius);border:1px solid var(--border2);background:transparent;color:var(--text);font-family:'Inter',sans-serif;font-size:0.82rem;cursor:pointer;transition:all 0.2s;margin-top:0.4rem}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary)}
+
+/* Catégories */
+.cat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem}
+.cat-title{font-family:'Syne',sans-serif;font-size:0.88rem;font-weight:700;color:var(--primary)}
+.cat-block{background:var(--card2);border-radius:10px;padding:0.8rem;margin-bottom:0.6rem}
+.plat-row{display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0;border-bottom:1px solid var(--border)}
+.plat-row:last-child{border-bottom:none;padding-bottom:0}
+.plat-em{font-size:1rem;width:24px;text-align:center;flex-shrink:0}
+.plat-name{flex:1;font-size:0.8rem;font-weight:500}
+.plat-price{font-size:0.78rem;color:var(--primary);font-weight:600;margin-right:0.4rem}
+.plat-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.8rem;padding:0.15rem;border-radius:4px;transition:all 0.15s}
+.plat-del:hover{color:#FF4757;background:rgba(255,71,87,0.1)}
+.add-plat-row{display:flex;gap:0.4rem;margin-top:0.6rem;flex-wrap:wrap}
+.inp-sm{flex:1;min-width:80px;background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:0.5rem 0.7rem;color:var(--text);font-size:0.78rem;outline:none;transition:border-color 0.2s}
+.inp-sm:focus{border-color:var(--primary)}
+.inp-sm::placeholder{color:var(--muted)}
+.btn-add-plat{background:var(--primary);color:white;border:none;border-radius:8px;padding:0.5rem 0.8rem;font-size:0.78rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0}
+.btn-add-plat:active{transform:scale(0.95)}
+.btn-add-cat{background:rgba(255,107,43,0.1);border:1px dashed rgba(255,107,43,0.3);color:var(--primary);border-radius:10px;padding:0.65rem;font-size:0.78rem;font-weight:600;cursor:pointer;width:100%;transition:all 0.2s;margin-top:0.4rem;font-family:'Inter',sans-serif}
+.btn-add-cat:hover{background:rgba(255,107,43,0.15)}
+
+/* QR Section */
+.qr-wrap{text-align:center;padding:1rem 0}
+#qrcode{display:inline-block;background:white;padding:14px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.3)}
+.qr-url{font-size:0.62rem;color:var(--muted);word-break:break-all;margin-top:0.6rem;padding:0 0.5rem}
+.qr-btns{display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;margin-top:0.8rem}
+.qr-btn{padding:0.5rem 1rem;border-radius:9px;font-size:0.77rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif}
+.qr-btn-o{background:rgba(255,107,43,0.12);border:1px solid rgba(255,107,43,0.3);color:var(--primary2)}
+.qr-btn-g{background:rgba(46,204,138,0.1);border:1px solid rgba(46,204,138,0.25);color:var(--green)}
+.table-sel{padding:0.42rem 0.8rem;border-radius:8px;background:var(--card2);border:1px solid var(--border2);color:var(--text);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;margin-bottom:0.6rem}
+
+/* ══ MENU CLIENT ══ */
+#menuView .nav{background:var(--surf)}
+.menu-hero{background:linear-gradient(135deg,rgba(255,107,43,0.1),transparent);padding:1.2rem 1.2rem 0.8rem;text-align:center}
+.menu-resto-logo{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--primary),var(--primary2));display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 0.7rem;box-shadow:0 6px 18px rgba(255,107,43,0.35)}
+.menu-resto-name{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:0.2rem}
+.menu-resto-sub{font-size:0.68rem;color:var(--muted2)}
+.menu-live{display:inline-flex;align-items:center;gap:0.35rem;background:rgba(46,204,138,0.1);border:1px solid rgba(46,204,138,0.2);border-radius:20px;padding:0.3rem 0.8rem;margin-top:0.6rem}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.menu-live-text{font-size:0.65rem;color:var(--green);font-weight:600}
+
+/* Catégories scroll */
+.cats-scroll{overflow-x:auto;padding:0.8rem 1rem 0.3rem;-webkit-overflow-scrolling:touch}
+.cats-scroll::-webkit-scrollbar{display:none}
+.cats-row{display:flex;gap:0.4rem;width:max-content}
+.cat-pill{padding:0.42rem 0.9rem;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--muted2);font-size:0.72rem;font-weight:500;cursor:pointer;white-space:nowrap;transition:all 0.2s}
+.cat-pill.on{background:var(--primary);color:white;border-color:var(--primary);font-weight:700;box-shadow:0 3px 10px rgba(255,107,43,0.3)}
+
+/* Section header */
+.sec-hd{display:flex;align-items:center;gap:0.5rem;padding:0.9rem 1rem 0.5rem}
+.sec-line{flex:1;height:1px;background:var(--border)}
+.sec-lbl{font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;color:var(--muted2);white-space:nowrap}
+
+/* Cartes plats */
+.menu-list{padding:0 1rem;display:flex;flex-direction:column;gap:0.5rem;padding-bottom:3rem}
+.mcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:0.85rem;display:flex;align-items:center;gap:0.7rem;transition:border-color 0.2s}
+.mcard:active{transform:scale(0.985)}
+.mcard-em{width:48px;height:48px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;border:1px solid var(--border)}
+.mcard-info{flex:1;min-width:0}
+.mcard-name{font-family:'Syne',sans-serif;font-size:0.88rem;font-weight:700;margin-bottom:0.15rem}
+.mcard-desc{font-size:0.68rem;color:var(--muted2);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcard-price{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--primary);flex-shrink:0}
+
+/* Badge dispo */
+.dispo{display:inline-block;font-size:0.58rem;font-weight:700;padding:0.1rem 0.4rem;border-radius:5px;background:rgba(46,204,138,0.1);color:var(--green);margin-top:0.2rem}
+
+/* Footer menu */
+.menu-footer{text-align:center;padding:1rem;font-size:0.62rem;color:var(--muted);border-top:1px solid var(--border)}
+.menu-footer strong{color:var(--primary);font-family:'Syne',sans-serif}
+
+/* Upsell banner */
+.upsell{margin:0.8rem 1rem;background:linear-gradient(135deg,rgba(255,107,43,0.08),rgba(255,154,92,0.03));border:1px solid rgba(255,107,43,0.2);border-radius:14px;padding:0.85rem 1rem;display:flex;align-items:center;gap:0.7rem}
+.upsell-text{flex:1;font-size:0.72rem;color:var(--muted2);line-height:1.5}
+.upsell-text strong{color:var(--text);display:block;font-size:0.78rem;margin-bottom:0.1rem}
+.upsell-btn{background:var(--primary);color:white;border:none;border-radius:8px;padding:0.45rem 0.8rem;font-size:0.7rem;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif}
+
+/* Logo client */
+.logo-upload-wrap{display:flex;align-items:center;gap:0.8rem;margin-bottom:0.55rem}
+.logo-preview{width:54px;height:54px;border-radius:14px;object-fit:cover;border:1px solid var(--border2);flex-shrink:0}
+.logo-preview-em{width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--primary2));display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;cursor:pointer;box-shadow:0 3px 10px rgba(255,107,43,0.3)}
+.logo-upload-info{flex:1}
+.logo-upload-btn{background:var(--card2);border:1px solid var(--border2);color:var(--muted2);padding:0.38rem 0.8rem;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;display:block;text-align:center;margin-top:0.3rem}
+.logo-upload-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+/* Photo plat */
+.plat-photo{width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1px solid var(--border)}
+.plat-photo-em{width:36px;height:36px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;cursor:pointer;border:1px dashed var(--border2);transition:border-color 0.2s}
+.plat-photo-em:hover{border-color:var(--primary)}
+
+/* Photo plat dans menu client */
+.mcard-photo{width:60px;height:60px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid var(--border)}
+.mcard-em{width:48px;height:48px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;border:1px solid var(--border)}
+
+/* Toast */
+.toast{position:fixed;bottom:1rem;left:1rem;right:1rem;background:var(--green);color:white;border-radius:var(--radius);padding:0.8rem 1.2rem;font-size:0.85rem;font-weight:600;text-align:center;transform:translateY(100px);opacity:0;transition:all 0.4s cubic-bezier(0.34,1.2,0.64,1);z-index:999}
+.toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<!-- ══ ÉCRAN ACTIVATION ══ -->
+<div id="licenseScreen" style="display:none;position:fixed;inset:0;background:#08090A;z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center">
+  <div style="width:56px;height:56px;background:linear-gradient(135deg,#FF6B2B,#FF9558);border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:white;font-family:'Syne',sans-serif;box-shadow:0 6px 20px rgba(255,107,43,0.4);margin:0 auto 0.6rem">U</div>
+  <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:0.1rem">Menu QR Simple</div>
+  <div style="font-size:0.65rem;color:#68696F;margin-bottom:1.8rem;letter-spacing:0.05em">Unpact Menu Tech · Abidjan 🇨🇮</div>
+  <div style="width:100%;max-width:310px;background:#16171A;border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:1.6rem 1.3rem;margin:0 auto">
+    <div style="font-size:1.4rem;margin-bottom:0.5rem">🔐</div>
+    <div style="font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;margin-bottom:0.35rem">Activation requise</div>
+    <div style="font-size:0.72rem;color:#9A9BA2;margin-bottom:1.3rem;line-height:1.6">Entrez votre code d'activation fourni par Unpact Menu Tech.</div>
+    <input id="licInput" type="text" placeholder="Ex: QRS-XXXX-XXXX" maxlength="13"
+      style="width:100%;background:#0F1012;border:1px solid rgba(255,255,255,0.13);border-radius:10px;padding:0.75rem;color:#F0F0EE;font-family:'Inter',sans-serif;font-size:1rem;outline:none;text-align:center;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.6rem"
+      oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')checkLic()">
+    <div id="licError" style="font-size:0.7rem;color:#FF4757;margin-bottom:0.6rem;display:none">❌ Code invalide. Contactez Unpact Menu Tech.</div>
+    <button onclick="checkLic()" style="width:100%;padding:0.88rem;border-radius:12px;border:none;background:linear-gradient(135deg,#FF6B2B,#FF9558);color:white;font-family:'Inter',sans-serif;font-size:0.87rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(255,107,43,0.3)">🔓 Activer</button>
+    <div style="margin-top:1.1rem;padding-top:0.9rem;border-top:1px solid rgba(255,255,255,0.07)">
+      <div style="font-size:0.65rem;color:#68696F;margin-bottom:0.35rem">Besoin d'un code ?</div>
+      <button onclick="window.open('https://wa.me/2250545129464?text=Bonjour%20Unpact%20Menu%20Tech%2C%20j%27ai%20besoin%20de%20mon%20code%20Menu%20QR%20Simple%20%F0%9F%94%90')"
+        style="background:none;border:none;color:#25D366;font-size:0.78rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.3rem;margin:0 auto">
+        📲 Contacter sur WhatsApp
+      </button>
+    </div>
+  </div>
+  <div style="margin-top:1.4rem;font-size:0.6rem;color:#68696F;line-height:1.7">
+    Logiciel propriétaire · Usage strictement personnel<br>
+    Toute reproduction ou revente est interdite<br>
+    <strong style="color:#FF6B2B">Unpact Menu Tech</strong> · © 2026
+  </div>
+</div>
+<div id="adminView" class="view on">
+  <div class="nav">
+    <div class="brand">
+      <div class="brand-logo">U</div>
+      <div>
+        <div class="brand-name">Menu <span>QR</span> Simple</div>
+        <div style="font-size:0.55rem;color:var(--muted2);letter-spacing:0.05em">Unpact Menu Tech</div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button class="nav-theme" onclick="toggleTheme()" id="themeBtn">☀️</button>
+      <button class="nav-btn primary" onclick="showMenu()">👁 Voir le menu</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- Infos restaurant -->
+    <div class="section-tag">🏪 Votre restaurant</div>
+    <div class="card">
+      <!-- Logo -->
+      <div class="label">Logo du restaurant</div>
+      <div class="logo-upload-wrap">
+        <div id="logoPreviewWrap">
+          <div class="logo-preview-em" id="logoEmoji" onclick="uploadLogo()">🍽</div>
+        </div>
+        <div class="logo-upload-info">
+          <div style="font-size:0.75rem;color:var(--text);font-weight:500">Photo ou logo</div>
+          <div style="font-size:0.65rem;color:var(--muted2);margin-top:0.1rem;line-height:1.5">Uploadez le logo de votre restaurant (JPG, PNG · max 400Ko)</div>
+          <button class="logo-upload-btn" onclick="uploadLogo()">📷 Choisir un logo</button>
+        </div>
+      </div>
+      <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
+      <div class="label">Nom du restaurant</div>
+      <input class="inp" id="restoName" placeholder="Ex: Restaurant Le Maquis Royal" oninput="saveData()">
+      <div class="inp-2">
+        <div>
+          <div class="label">Emoji (si pas de logo)</div>
+          <input class="inp" id="restoIcon" placeholder="🍽" maxlength="2" oninput="saveData()" style="font-size:1.2rem;text-align:center">
+        </div>
+        <div>
+          <div class="label">Quartier</div>
+          <input class="inp" id="restoZone" placeholder="Ex: Cocody" oninput="saveData()">
+        </div>
+      </div>
+      <div class="label">Nombre de tables</div>
+      <input class="inp" id="restoTables" type="number" min="1" max="100" placeholder="Ex: 10" oninput="saveData();updateTableSel()">
+    </div>
+
+    <!-- Menu -->
+    <div class="section-tag">🍽 Votre menu</div>
+    <div id="menuEditor"></div>
+    <button class="btn-add-cat" onclick="toggleAddCat()">+ Ajouter une catégorie</button>
+    <div id="addCatBox" style="display:none;background:var(--card);border:1px solid rgba(255,107,43,0.3);border-radius:var(--radius);padding:0.9rem;margin-top:0.5rem">
+      <div class="label">Nom de la catégorie</div>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <input class="inp-sm" id="newCatInput" placeholder="Ex: 🥗 Entrées, 🍰 Desserts..." style="flex:1;font-size:0.83rem;padding:0.6rem 0.8rem;border-radius:9px" onkeydown="if(event.key==='Enter')confirmAddCat()">
+        <button class="btn-add-plat" style="padding:0.6rem 1rem;font-size:0.82rem" onclick="confirmAddCat()">✓ Ajouter</button>
+        <button onclick="toggleAddCat()" style="background:var(--card2);border:1px solid var(--border2);color:var(--muted2);padding:0.6rem 0.8rem;border-radius:9px;cursor:pointer;font-size:0.82rem">✕</button>
+      </div>
+      <div style="font-size:0.65rem;color:var(--muted);margin-top:0.4rem">Conseil : commencez par un emoji 🍛 🥤 🍰 🥗</div>
+    </div>
+
+    <!-- QR Code -->
+    <div style="margin-top:1rem" class="section-tag">📱 QR Code par table</div>
+    <div class="card">
+      <select class="table-sel" id="tableSelect" onchange="genQR()"></select>
+      <div class="qr-wrap">
+        <div id="qrcode"></div>
+        <div class="qr-url" id="qrUrl"></div>
+      </div>
+      <div class="qr-btns">
+        <button class="qr-btn qr-btn-o" onclick="window.print()">🖨 Imprimer</button>
+        <button class="qr-btn qr-btn-g" onclick="copyLink()">📋 Copier le lien</button>
+        <button class="qr-btn qr-btn-o" onclick="shareMenu()">📲 Partager</button>
+      </div>
+    </div>
+
+    <!-- Upgrade Unpact -->
+    <div style="background:linear-gradient(135deg,rgba(255,209,102,0.08),rgba(255,107,43,0.04));border:1px solid rgba(255,209,102,0.2);border-radius:var(--radius-lg);padding:1.2rem;margin-bottom:1rem;text-align:center">
+      <div style="font-size:1.2rem;margin-bottom:0.4rem">⬆️</div>
+      <div style="font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem">Passer à Unpact Menu Tech</div>
+      <div style="font-size:0.72rem;color:var(--muted2);margin-bottom:0.8rem;line-height:1.6">Commande en ligne · Paiement Wave / Orange / MTN · Dashboard admin complet · Gestion livraison</div>
+      <button onclick="window.open('https://wa.me/2250545129464?text=Bonjour%20Unpact%20Menu%20Tech%2C%20je%20veux%20passer%20au%20plan%20Starter%20ou%20Business%20%F0%9F%9A%80')" style="background:linear-gradient(135deg,var(--gold),#FFAA33);color:#3A2800;border:none;border-radius:10px;padding:0.65rem 1.4rem;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">📲 Contacter Unpact Menu Tech</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ VUE MENU CLIENT ══ -->
+<div id="menuView" class="view">
+  <div class="nav">
+    <div class="brand">
+      <div id="menuLogoBox" class="brand-logo">🍽</div>
+      <div>
+        <div class="brand-name" id="menuRestoName" style="font-size:0.85rem">Mon Restaurant</div>
+        <div style="font-size:0.58rem;color:var(--muted2)" id="menuRestoZone">Abidjan</div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button class="nav-theme" onclick="toggleTheme()">☀️</button>
+      <button class="nav-btn" onclick="showAdmin()" id="backBtn" style="display:none">⚙ Admin</button>
+    </div>
+  </div>
+
+  <div class="menu-hero">
+    <div class="menu-resto-logo" id="heroLogo">🍽</div>
+    <div class="menu-resto-name" id="heroName">Mon Restaurant</div>
+    <div class="menu-resto-sub" id="heroZone">Abidjan · Côte d'Ivoire 🇨🇮</div>
+    <div class="menu-live">
+      <div class="live-dot"></div>
+      <div class="menu-live-text">Menu disponible · Bonne dégustation !</div>
+    </div>
+  </div>
+
+  <div class="cats-scroll"><div class="cats-row" id="clientCats"></div></div>
+  <div class="sec-hd"><div class="sec-line"></div><div class="sec-lbl" id="clientSecLbl"></div><div class="sec-line"></div></div>
+  <div class="menu-list" id="clientMenuList"></div>
+
+  <!-- Upsell commande en ligne -->
+  <div class="upsell">
+    <div style="font-size:1.4rem">📱</div>
+    <div class="upsell-text">
+      <strong>Commander en ligne disponible bientôt !</strong>
+      Ce restaurant prépare la commande et le paiement Mobile Money.
+    </div>
+  </div>
+
+  <div class="menu-footer">
+    Menu digital propulsé par <strong>Unpact Menu Tech</strong> 🇨🇮
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ LICENCE MENU QR SIMPLE ══
+const QRS_SECRET = 'QRS2026CI';
+function generateQRSCode(clientId) {
+  const raw = QRS_SECRET + clientId.toUpperCase();
+  let h = 0;
+  for (let i = 0; i < raw.length; i++) {
+    h = ((h << 5) - h) + raw.charCodeAt(i);
+    h |= 0;
+  }
+  const p1 = Math.abs(h % 10000).toString().padStart(4,'0');
+  const p2 = Math.abs((h >> 4) % 10000).toString().padStart(4,'0');
+  return `QRS-${p1}-${p2}`;
+}
+function isValidQRSCode(code) {
+  const saved = localStorage.getItem('umt_qrs_license');
+  if (saved === 'ACTIVATED') return true;
+  for (let id = 1; id <= 9999; id++) {
+    if (generateQRSCode(String(id)) === code.toUpperCase()) return true;
+  }
+  return false;
+}
+function checkLic() {
+  const code = document.getElementById('licInput').value.trim().toUpperCase();
+  const errEl = document.getElementById('licError');
+  if (!code) { errEl.style.display='block'; return; }
+  if (isValidQRSCode(code)) {
+    localStorage.setItem('umt_qrs_license', 'ACTIVATED');
+    localStorage.setItem('umt_qrs_code', code);
+    document.getElementById('licenseScreen').style.display = 'none';
+    errEl.style.display = 'none';
+    init();
+  } else {
+    errEl.style.display = 'block';
+    document.getElementById('licInput').style.borderColor = '#FF4757';
+    setTimeout(() => document.getElementById('licInput').style.borderColor = '', 2000);
+  }
+}
+function initLicenseCheck() {
+  const activated = localStorage.getItem('umt_qrs_license') === 'ACTIVATED';
+  const isClient = new URLSearchParams(location.search).has('menu');
+  const screen = document.getElementById('licenseScreen');
+  if (!activated && !isClient) {
+    // Côté admin → vérification requise
+    screen.style.display = 'flex';
+    document.getElementById('adminView').style.display = 'none';
+  } else {
+    screen.style.display = 'none';
+  }
+}
+initLicenseCheck();
+
+// ══ DONNÉES ══
+let DATA = JSON.parse(localStorage.getItem('umt_qr_data') || 'null') || {
+  name: '', icon: '🍽', zone: '', tables: 5,
+  menu: {
+    '🍛 Plats': [
+      {e:'🍛', n:'Thiéboudienne royale', d:'Riz au poisson, légumes', p:4500},
+      {e:'🍗', n:'Poulet braisé attiéké', d:'Marinade pimentée, attiéké', p:4200},
+    ],
+    '🥤 Boissons': [
+      {e:'🥤', n:'Bissap maison', d:'Hibiscus, gingembre', p:1000},
+      {e:'💧', n:'Eau minérale', d:'75cl', p:600},
+    ]
+  }
+};
+let activeCat = Object.keys(DATA.menu)[0];
+const isMenuMode = new URLSearchParams(location.search).has('menu');
+
+// ══ INIT ══
+function init(){
+  if(isMenuMode){
+    showMenuOnly();
+  } else {
+    showAdmin();
+    loadForm();
+    renderEditor();
+    updateTableSel();
+    genQR();
+  }
+  if(localStorage.getItem('umt_qr_theme')==='light') applyLight();
+}
+
+function showMenuOnly(){
+  document.getElementById('adminView').classList.remove('on');
+  document.getElementById('menuView').classList.add('on');
+  document.getElementById('backBtn').style.display='none';
+  renderClientMenu();
+}
+function showMenu(){
+  document.getElementById('adminView').classList.remove('on');
+  document.getElementById('menuView').classList.add('on');
+  document.getElementById('backBtn').style.display='flex';
+  renderClientMenu();
+}
+function showAdmin(){
+  document.getElementById('menuView').classList.remove('on');
+  document.getElementById('adminView').classList.add('on');
+}
+
+// ══ THEME ══
+function toggleTheme(){
+  document.body.classList.toggle('light');
+  const l=document.body.classList.contains('light');
+  localStorage.setItem('umt_qr_theme',l?'light':'dark');
+  document.querySelectorAll('.nav-theme').forEach(b=>b.textContent=l?'🌙':'☀️');
+}
+function applyLight(){
+  document.body.classList.add('light');
+  document.querySelectorAll('.nav-theme').forEach(b=>b.textContent='🌙');
+}
+
+// ══ LOGO RESTAURANT ══
+function uploadLogo(){document.getElementById('logoInput').click()}
+function handleLogoUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  if(file.size>400000){showToast('⚠️ Image trop lourde. Max 400Ko');return}
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    DATA.logo=ev.target.result;
+    saveData();updateLogoPreview();showToast('✅ Logo ajouté !');
+  };
+  reader.readAsDataURL(file);
+}
+function updateLogoPreview(){
+  const wrap=document.getElementById('logoPreviewWrap');
+  if(DATA.logo){
+    wrap.innerHTML=`<img src="${DATA.logo}" class="logo-preview" onclick="removeLogo()" title="Appuyer pour supprimer">`;
+  } else {
+    wrap.innerHTML=`<div class="logo-preview-em" id="logoEmoji" onclick="uploadLogo()">${DATA.icon||'🍽'}</div>`;
+  }
+}
+function removeLogo(){
+  const backup=DATA.logo;
+  delete DATA.logo;saveData();updateLogoPreview();
+  showToastWithUndo('🗑 Logo supprimé',()=>{DATA.logo=backup;saveData();updateLogoPreview();});
+}
+
+// ══ PHOTOS PLATS ══
+function uploadPlatPhoto(cat,pi){
+  const input=document.createElement('input');
+  input.type='file';input.accept='image/*';
+  input.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    if(file.size>400000){showToast('⚠️ Photo trop lourde. Max 400Ko');return}
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      DATA.menu[cat][pi].photo=ev.target.result;
+      saveData();renderEditor();showToast('✅ Photo ajoutée !');
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+function removePlatPhoto(cat,pi){
+  const backup=DATA.menu[cat][pi].photo;
+  delete DATA.menu[cat][pi].photo;
+  saveData();renderEditor();
+  showToastWithUndo('🗑 Photo supprimée',()=>{DATA.menu[cat][pi].photo=backup;saveData();renderEditor();});
+}
+
+// ══ FORM ══
+function loadForm(){
+  document.getElementById('restoName').value=DATA.name||'';
+  document.getElementById('restoIcon').value=DATA.icon||'🍽';
+  document.getElementById('restoZone').value=DATA.zone||'';
+  document.getElementById('restoTables').value=DATA.tables||5;
+  updateLogoPreview();
+}
+function saveData(){
+  DATA.name=document.getElementById('restoName').value||'Mon Restaurant';
+  DATA.icon=document.getElementById('restoIcon').value||'🍽';
+  DATA.zone=document.getElementById('restoZone').value||'Abidjan';
+  DATA.tables=parseInt(document.getElementById('restoTables').value)||5;
+  localStorage.setItem('umt_qr_data',JSON.stringify(DATA));
+}
+
+// ══ MENU EDITOR ══
+function renderEditor(){
+  document.getElementById('menuEditor').innerHTML=Object.entries(DATA.menu).map(([cat,items],ci)=>`
+    <div class="card" style="margin-bottom:0.7rem">
+      <div class="cat-header">
+        <div class="cat-title">${cat}</div>
+        <button onclick="deleteCat('${cat}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.8rem" title="Supprimer">🗑</button>
+      </div>
+      <div class="cat-block">
+        ${items.map((p,pi)=>`<div class="plat-row">
+          ${p.photo
+            ?`<img src="${p.photo}" class="plat-photo" onclick="removePlatPhoto('${cat}',${pi})" title="Appuyer pour supprimer la photo">`
+            :`<div class="plat-photo-em" onclick="uploadPlatPhoto('${cat}',${pi})" title="Ajouter une photo">📷</div>`}
+          <div class="plat-name">${p.n}<br><span style="font-size:0.65rem;color:var(--muted2)">${p.d||''}</span></div>
+          <div class="plat-price">${p.p.toLocaleString()} FCFA</div>
+          <button class="plat-del" onclick="deletePlat('${cat}',${pi})">✕</button>
+        </div>`).join('')}
+        <div class="add-plat-row">
+          <input class="inp-sm" placeholder="🍽" id="em_${ci}" maxlength="2" style="max-width:48px;text-align:center;font-size:1rem">
+          <input class="inp-sm" placeholder="Nom du plat" id="nm_${ci}" style="flex:2">
+          <input class="inp-sm" placeholder="Description" id="ds_${ci}" style="flex:2">
+          <input class="inp-sm" placeholder="Prix FCFA" id="pr_${ci}" type="number" style="max-width:90px">
+          <button class="btn-add-plat" onclick="addPlat('${cat}',${ci})">+ Ajouter</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function addPlat(cat, ci){
+  const e=document.getElementById(`em_${ci}`).value.trim()||'🍽';
+  const n=document.getElementById(`nm_${ci}`).value.trim();
+  const d=document.getElementById(`ds_${ci}`).value.trim();
+  const p=parseInt(document.getElementById(`pr_${ci}`).value)||0;
+  if(!n){showToast('⚠️ Entrez le nom du plat');return}
+  DATA.menu[cat].push({e,n,d,p});
+  saveData();renderEditor();showToast('✅ Plat ajouté !');
+}
+function deletePlat(cat,pi){
+  DATA.menu[cat].splice(pi,1);
+  saveData();renderEditor();
+}
+function toggleAddCat(){
+  const box=document.getElementById('addCatBox');
+  const isOpen=box.style.display==='block';
+  box.style.display=isOpen?'none':'block';
+  if(!isOpen)setTimeout(()=>document.getElementById('newCatInput').focus(),100);
+}
+function confirmAddCat(){
+  const input=document.getElementById('newCatInput');
+  const name=input.value.trim();
+  if(!name){showToast('⚠️ Entrez le nom de la catégorie');return}
+  if(DATA.menu[name]){showToast('⚠️ Cette catégorie existe déjà');return}
+  DATA.menu[name]=[];
+  saveData();renderEditor();
+  input.value='';
+  document.getElementById('addCatBox').style.display='none';
+  showToast('✅ Catégorie ajoutée !');
+}
+function deleteCat(cat){
+  // Pas de confirm() — on supprime directement avec toast annulable
+  const backup=JSON.parse(JSON.stringify(DATA.menu[cat]));
+  delete DATA.menu[cat];
+  saveData();renderEditor();
+  showToastWithUndo(`🗑 Catégorie "${cat}" supprimée`,()=>{
+    DATA.menu[cat]=backup;
+    saveData();renderEditor();
+  });
+}
+
+// ══ QR CODE ══
+function updateTableSel(){
+  const n=parseInt(document.getElementById('restoTables').value)||5;
+  const sel=document.getElementById('tableSelect');
+  sel.innerHTML=Array.from({length:Math.min(n,100)},(_,i)=>`<option value="${i+1}">Table ${i+1}</option>`).join('');
+  genQR();
+}
+function genQR(){
+  const t=document.getElementById('tableSelect')?.value||1;
+  const url=`${location.href.split('?')[0]}?menu=1&table=${t}`;
+  document.getElementById('qrUrl').textContent=url;
+  const el=document.getElementById('qrcode');
+  el.innerHTML='';
+  new QRCode(el,{text:url,width:160,height:160,colorDark:'#111',colorLight:'#FFFFFF'});
+}
+function copyLink(){
+  navigator.clipboard.writeText(document.getElementById('qrUrl').textContent)
+    .then(()=>showToast('📋 Lien copié !'));
+}
+function shareMenu(){
+  const url=document.getElementById('qrUrl').textContent;
+  const name=DATA.name||'notre restaurant';
+  if(navigator.share){
+    navigator.share({title:`Menu de ${name}`,text:`Scannez pour voir notre menu 🍽`,url});
+  } else {
+    window.open(`https://wa.me/?text=${encodeURIComponent(`Voici le menu de ${name} 🍽\n${url}`)}`);
+  }
+}
+
+// ══ MENU CLIENT ══
+function renderClientMenu(){
+  const cats=Object.keys(DATA.menu);
+  if(!cats.length)return;
+  if(!activeCat||!DATA.menu[activeCat])activeCat=cats[0];
+
+  // Header — logo ou emoji
+  const logoHtml=DATA.logo
+    ?`<img src="${DATA.logo}" style="width:56px;height:56px;border-radius:16px;object-fit:cover;margin:0 auto 0.7rem;display:block;box-shadow:0 6px 18px rgba(0,0,0,0.3)">`
+    :`<div class="menu-resto-logo">${DATA.icon||'🍽'}</div>`;
+  document.querySelector('.menu-hero').innerHTML=`
+    ${logoHtml}
+    <div class="menu-resto-name" id="heroName">${DATA.name||'Mon Restaurant'}</div>
+    <div class="menu-resto-sub">${DATA.zone||'Abidjan'} · Côte d'Ivoire 🇨🇮</div>
+    <div class="menu-live"><div class="live-dot"></div><div class="menu-live-text">Menu disponible · Bonne dégustation !</div></div>`;
+
+  // Nav logo
+  const navLogoBox=document.getElementById('menuLogoBox');
+  if(DATA.logo){
+    navLogoBox.style.background='none';
+    navLogoBox.innerHTML=`<img src="${DATA.logo}" style="width:32px;height:32px;border-radius:9px;object-fit:cover">`;
+  } else {
+    navLogoBox.style.background='';
+    navLogoBox.textContent=DATA.icon||'🍽';
+  }
+  document.getElementById('menuRestoName').textContent=DATA.name||'Mon Restaurant';
+  document.getElementById('menuRestoZone').textContent=(DATA.zone||'Abidjan')+' · Côte d\'Ivoire 🇨🇮';
+
+  // Catégories
+  document.getElementById('clientCats').innerHTML=cats.map(c=>
+    `<button class="cat-pill ${c===activeCat?'on':''}" onclick="setClientCat('${c}')">${c}</button>`
+  ).join('');
+
+  // Section label
+  document.getElementById('clientSecLbl').textContent=activeCat;
+
+  // Plats avec photos
+  const items=DATA.menu[activeCat]||[];
+  document.getElementById('clientMenuList').innerHTML=items.length
+    ?items.map(p=>`
+      <div class="mcard">
+        ${p.photo
+          ?`<img src="${p.photo}" class="mcard-photo">`
+          :`<div class="mcard-em">${p.e||'🍽'}</div>`}
+        <div class="mcard-info">
+          <div class="mcard-name">${p.n}</div>
+          ${p.d?`<div class="mcard-desc">${p.d}</div>`:''}
+          <div class="dispo">✓ Disponible</div>
+        </div>
+        <div class="mcard-price">${p.p.toLocaleString()} FCFA</div>
+      </div>`).join('')
+    :`<div style="text-align:center;padding:2rem;color:var(--muted);font-size:0.8rem">Aucun plat dans cette catégorie</div>`;
+}
+
+function setClientCat(c){
+  activeCat=c;
+  renderClientMenu();
+}
+
+// ══ TOAST ══
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.innerHTML=msg;t.onclick=null;t._undo=null;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+function showToastWithUndo(msg,undoFn){
+  const t=document.getElementById('toast');
+  t.innerHTML=`${msg} <span style="text-decoration:underline;cursor:pointer;margin-left:0.6rem;font-weight:700" onclick="undoAction()">Annuler</span>`;
+  t._undo=undoFn;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),4000);
+}
+function undoAction(){
+  const t=document.getElementById('toast');
+  if(t._undo){t._undo();t._undo=null;}
+  t.classList.remove('show');
+}
+
+init();
+</script>
+</body>
+</html>
